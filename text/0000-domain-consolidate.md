@@ -7,12 +7,12 @@
 ## Summary
 [summary]: #summary
 
-Merge the `domain` and `domains` fields of domain into a single object. Deprecate the `domain` accessor so that `.d` and `.domains` are the only accessors. 
+Merge the `domain` and `domains` fields of Module into a single object. Deprecate the `domain` accessor so that `.d` and `.domains` are the only accessors.
 
 ## Motivation
 [motivation]: #motivation
 
-This came up as part of a project to document Amaranth's undocumented features. Currently module objects have three fields named `d`, `domain`, and `domains`, with `d` being an alias for `domain`. The documentation in places mentions both `d` and `domains`, but does not currently explain the difference, and currently does not document `domain` in any way. In practice, both `domain` and `domains` provide access to the module's synchronous clock domains, but `domain` is "read-only" and "domains" is "write-only"; you can say `m.d.sync += ...` or `m.domains["sync"] =` but the reverse statements are not allowed. None of this seems to have been intentional or planned in any way.
+This came up as part of a project to document Amaranth's undocumented features. Currently module objects have three fields named `d`, `domain`, and `domains`, with `d` being an alias for `domain`. The documentation in places mentions both `d` and `domains`, but does not currently explain the difference, and currently does not document `domain` in any way. In practice, both `domain` and `domains` provide access to the module's synchronous clock domains, but `domain` is "read-only" and `domains` is "write-only"; you can say `m.d.sync += ...` or `m.domains["sync"] =` but the reverse statements are not allowed. None of this seems to have been intentional or planned in any way.
 
 This is confusing, difficult to document, and probably not well understood by most Amaranth users. However, because the two objects' uses are "non-overlapping", they could be merged into one object without drawbacks.
 
@@ -38,12 +38,12 @@ If `domain` is being used in existing Amaranth code— the `domain` language is 
 ## Rationale and alternatives
 [rationale-and-alternatives]: #rationale-and-alternatives
 
-Alternatives are
+Alternatives include
 
 1. Leave `domain` in place; have `m.d`, `m.domain`, and `m.d.domains` all be aliases for one object.
 2. Do nothing.
 
-The downsides of both these options is they will significantly complicate explaining these features in the documentation; probably, if a feature is too complex to easily document, this is a sign the feature itself may be flawed. Alternative 1 would have a lesser impact on documentation clarity because we could use the language "a second alias, `m.domain`, is also allowed for legacy reasons, but discouraged". 
+The downsides of both these options is they will significantly complicate explaining these features in the documentation; and probably, if a feature is too complex to easily document, this is a sign the feature itself may be flawed. Alternative 1 would have a lesser impact on documentation clarity because we could use the language "a second alias, `m.domain`, is also allowed for legacy reasons, but discouraged".
 
 ## Prior art
 [prior-art]: #prior-art
