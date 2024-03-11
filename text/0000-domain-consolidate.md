@@ -30,10 +30,18 @@ This text is sufficient to make the new behavior clear to new users. Existing us
 
 This would naturally appear as part of the documentation of the `Module` class, which is not yet written.
 
+Note from Catherine:
+
+> what you do not list in the RFC is how to implement `m.domains["foo"]` += considering that it would return a `ClockDomain` object on which then `__iadd__` would be called
+>
+> `[]+=` is not a unified operation in Python
+>
+> or I guess it's the other way around, how would it return a ClockDomain object if m.domains["foo"] currently returns a proxy object implementing +=
+
 ## Drawbacks
 [drawbacks]: #drawbacks
 
-If `domain` is being used in existing Amaranth code— the `domain` language is taken from migen, so although `domain` has never been documented, ported code may contain it anyway— this code would break.
+If `domain` is being explicitly used in existing Amaranth code this code would break (unless we follow "alternative 1" below); however it's possible no such code exists, since `domain` was never documented.
 
 ## Rationale and alternatives
 [rationale-and-alternatives]: #rationale-and-alternatives
@@ -45,16 +53,19 @@ Alternatives include
 
 The downsides of both these options is they will significantly complicate explaining these features in the documentation; and probably, if a feature is too complex to easily document, this is a sign the feature itself may be flawed. Alternative 1 would have a lesser impact on documentation clarity because we could use the language "a second alias, `m.domain`, is also allowed for legacy reasons, but discouraged".
 
+## Migration path
+
+For 1 release, the `.domain` property should become an alias for `m.d.domains`, but when accessed it should print a "this property is deprecated, use m.domains" warning.
+
 ## Prior art
 [prior-art]: #prior-art
 
-Migen contains the `domain` field, behaving largely the same way as amaranth `m.d`/`m.domain`. The `m.domains` syntax is new to Amaranth.
+[Migen has](https://gist.github.com/cr1901/5de5b276fca539b66fe7f4493a5bfe7d) a paired syntax somewhat similar to Amaranth's current design: There's a `self.clock_domains` field assigned to for declaring new clock domains, broadly similar to amaranth `m.domains`; and domains previously assigned to `clock_domains` are read back as properties of `self.sync`, similar to the properties of `m.d` (aka `m.domain`).
 
 ## Unresolved questions
 [unresolved-questions]: #unresolved-questions
 
 - Does code using the `m.domain` field exist in the wild?
-- Does the "style guide" of existing Amaranth API use the singular or plural when exposing collections as fields? (I.E. is it `m.domain` or `m.domains` which better matches similar places in the API?)
 
 ## Future possibilities
 [future-possibilities]: #future-possibilities
